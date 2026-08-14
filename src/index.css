@@ -1,0 +1,226 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Дизайн-токены (Tailwind v4 @theme)
+   Небольшой набор: 2 уровня поверхностей, 2 тени, 2 радиуса,
+   единые границы-hairline и акцент. Используется через утилиты
+   вида bg-surface-1 / border-hairline / rounded-card / shadow-e1.
+   ============================================================ */
+@theme {
+  /* Шрифт — JetBrains Mono, крупный x-height хорошо читается */
+  --font-sans:
+    "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", "Consolas",
+    monospace;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", "Consolas",
+    monospace;
+
+  /* Базовый фон приложения. Гамма сдвинута к градиенту логотипа REVENANT
+     (blue-400 → purple-400): hue ≈ 245° вместо прежних 220°. */
+  --color-canvas: #070617;
+
+  /* Поверхности — две «высоты» вместо десятка прозрачностей */
+  --color-surface-1: #101029; /* карточки, панели */
+  --color-surface-2: #181834; /* приподнятые/интерактивные состояния */
+  --color-surface-input: #131230; /* поля ввода */
+
+  /* Границы */
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.14);
+
+  /* Акцент (для CTA и активных состояний) */
+  --color-accent: #7c7dff;
+  --color-accent-strong: #9b7dff;
+
+  /* Градиент логотипа — единый источник правды для CTA и акцентов */
+  --color-brand-from: #60a5fa;
+  --color-brand-to: #c084fc;
+
+  /* Радиусы — всего два значения (+ full из Tailwind) */
+  --radius-control: 14px;
+  --radius-card: 20px;
+
+  /* Тени — два уровня высоты */
+  --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-e2: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Единый цвет фона для overscroll / rubber-band, совпадает с canvas */
+  background-color: var(--color-canvas);
+}
+
+body {
+  /* Ровный, консистентный тёмный фон. Пиксельный космос рисует canvas (Background.tsx). */
+  background-color: var(--color-canvas);
+  color: rgb(241 245 249); /* slate-100 — контрастный базовый текст */
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+.privacy-consent:focus-visible + label {
+  border-radius: 14px;
+  outline: 2px solid rgb(191 219 254);
+  outline-offset: 4px;
+}
+
+/* ============================================================
+   Космические карточки
+   Тон задаётся переменной --tint на самом элементе. Заливка ≤10%,
+   поэтому цвет читается, но не спорит с текстом.
+
+   Правило вне @layer — иначе утилиты Tailwind (bg-*, border-*)
+   перекрыли бы background-color и border-color. На элементе с
+   .card-cosmic не ставить bg-surface-* / border-hairline*,
+   только border (ширина) и rounded-card.
+   ============================================================ */
+.card-cosmic {
+  --tint: #5b8cff;
+  background-color: var(--color-surface-1);
+  background-image: linear-gradient(
+    155deg,
+    color-mix(in oklab, var(--tint) 10%, transparent) 0%,
+    color-mix(in oklab, var(--tint) 3%, transparent) 45%,
+    transparent 75%
+  );
+  border-color: color-mix(in oklab, var(--tint) 20%, rgba(255, 255, 255, 0.08));
+}
+
+.card-cosmic:hover {
+  border-color: color-mix(in oklab, var(--tint) 34%, rgba(255, 255, 255, 0.14));
+}
+
+/* Вложенная поверхность внутри космической карточки (surface-2 + тот же тон) */
+.card-cosmic-inner {
+  background-color: var(--color-surface-2);
+  background-image: linear-gradient(
+    155deg,
+    color-mix(in oklab, var(--tint) 7%, transparent) 0%,
+    transparent 70%
+  );
+  border-color: color-mix(in oklab, var(--tint) 14%, rgba(255, 255, 255, 0.08));
+}
+
+/* ============================================================
+   Космический blueprint — статичный фоновый слой.
+   Шаг мелкой сетки 40px ДОЛЖЕН совпадать с GRID в Background.tsx:
+   canvas подсвечивает ячейки поверх этой сетки, координаты общие
+   (обе привязаны к 0,0 вьюпорта).
+   ============================================================ */
+.blueprint {
+  background-image:
+    /* мажорная сетка 200px */
+    linear-gradient(to right, rgba(139, 146, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139, 146, 255, 0.055) 1px, transparent 1px),
+    /* мелкая сетка 40px */
+    linear-gradient(to right, rgba(139, 146, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139, 146, 255, 0.028) 1px, transparent 1px);
+  background-size:
+    200px 200px,
+    200px 200px,
+    40px 40px,
+    40px 40px;
+  background-position: 0 0;
+}
+
+/* Орбитальные кольца — чертёжная геометрия поверх сетки */
+.blueprint::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      circle at 78% 20%,
+      transparent 118px,
+      rgba(192, 132, 252, 0.05) 119px,
+      rgba(192, 132, 252, 0.05) 120px,
+      transparent 121px
+    ),
+    radial-gradient(
+      circle at 78% 20%,
+      transparent 198px,
+      rgba(96, 165, 250, 0.04) 199px,
+      rgba(96, 165, 250, 0.04) 200px,
+      transparent 201px
+    ),
+    radial-gradient(
+      circle at 12% 76%,
+      transparent 148px,
+      rgba(96, 165, 250, 0.045) 149px,
+      rgba(96, 165, 250, 0.045) 150px,
+      transparent 151px
+    );
+}
+
+/* ============================================================
+   Анимации на чистом CSS (вместо framer-motion)
+   ============================================================ */
+
+/* Плавное появление при попадании в вьюпорт (через IntersectionObserver) */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Появление всплывающих слоёв: меню, выпадающий список, тост */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-pop {
+  animation: pop-in 0.18s ease-out both;
+}
+
+/* Тряска поля при ошибке валидации */
+@keyframes field-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+.animate-shake {
+  animation: field-shake 0.28s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-pop,
+  .animate-shake {
+    animation: none;
+  }
+}

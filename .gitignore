@@ -1,0 +1,51 @@
+# --- Node ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Vite ---
+dist/
+vite.config.ts.timestamp*
+.vite/
+.cache/
+
+# --- TypeScript ---
+*.tsbuildinfo
+*.tsbuildinfo.tmp
+
+# --- Tailwind ---
+.postcss-cache/
+
+*.editorjs-backup.json
+*.editorjs-temp.json
+
+# --- Logs ---
+logs/
+*.log
+*.log.*
+debug.log
+docs/
+
+# --- Environment ---
+.env
+.env.*
+!.env.example
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Build tools ---
+coverage/
+.cache/
+temp/
+tmp/
+.claude
